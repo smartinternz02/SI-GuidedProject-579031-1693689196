@@ -1,0 +1,64 @@
+import pandas as pd
+import numpy as np
+#reading both the files
+anime=pd.read_csv('/content/anime.csv' ,sep=',')
+classification=pd.read_csv('/content/rating.csv' ,sep=',')
+print(anime.head())
+print(classification.head())
+[8/16, 20:35] +91 70932 67817: #dimension of both the csv file
+print(anime.shape)
+print(classification.shape)
+[8/16, 20:35] +91 70932 67817: #data types of each column
+print(anime.dtypes)
+print(classification.dtypes)
+[8/16, 20:35] +91 70932 67817: #duplicates
+print(anime.loc[anime.duplicated()])
+print(classification.loc[classification.duplicated()])
+[8/16, 20:35] +91 70932 67817: ##preprocessing the datas
+#modify column name
+anime.rename(columns={'name':'Name','genre':'Genre','type':'Type','episodes':'Episodes','rating':'classification','members':'Members'},inplace=True)
+classification.rename(columns={'rating':'classification'},inplace=True)
+print(anime.columns)
+print(classification.columns)
+[8/16, 20:35] +91 70932 67817: #null values
+print(anime.isna() .sum())
+print(classification.isna() .sum())
+[8/16, 20:35] +91 70932 67817: #remove duplicate values
+classification.drop_duplicates(inplace=True)
+[8/16, 20:35] +91 70932 67817: #fill in null values
+anime['classification'].fillna(anime['classification'].median() , inplace=True)
+anime['Genre'].fillna(anime['Genre'].mode()[0],inplace=True)
+anime['Type'].fillna(anime['Type'].mode()[0],inplace=True)
+[8/16, 20:35] +91 70932 67817: df=pd.merge(anime,classification,on='anime_id')
+[8/16, 20:35] +91 70932 67817: df.rename(columns={'classification_y':'user_classification','classification_x':'classification'},inplace=True)
+[8/16, 20:35] +91 70932 67817: df.head
+[8/16, 20:35] +91 70932 67817: df.shape
+[8/16, 20:35] +91 70932 67817: ##Visualization
+import plotly.express as px
+Top_anime_classification=anime.sort_values(by='classification',ascending=False)
+#creating barchart
+fig=px.bar(
+    x=Top_anime_classification['Name'][:20],
+    y=Top_anime_classification['classification'][:20],
+    labels={'x':'Name of anime','y':'classification'},
+    title='Top anime by ranking',
+    
+)
+fig.show()
+[8/16, 20:35] +91 70932 67817: #best anime by community
+Top_anime_members=anime.sort_values(by='Members',ascending=False)
+fig1=px.bar(
+    x=Top_anime_members['Name'][:20],
+    y=Top_anime_members['Members'][:20],
+    labels={'x':'Name of anime','y':'Total Members'},
+    title='Top anime members',
+)
+fig1.show()
+[8/16, 20:35] +91 70932 67817: #anime category distribution
+fig2=px.bar(
+    x=anime.value_counts('Type').index,
+    y=anime.value_counts('Type').values,
+    labels={'x':'Category','y':'Frequency'},
+    title='Category of anime'
+)
+fig2.show()
